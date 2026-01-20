@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Generator</title>
+<style>
+    /* --- Basic Reset --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background:#035e81; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+    
+    /* --- Container --- */
+    .container {
+        background:#fff; padding:30px 25px; border-radius:15px; box-shadow:0 6px 25px rgba(0,0,0,0.15); width:90%; max-width:400px;
+    }
+    h1 { text-align:center; margin-bottom:25px; color:#333; font-size:26px; }
+    
+    /* --- Display --- */
+    .display { display:flex; margin-bottom:20px; }
+    .display input { flex:1; padding:10px; font-size:16px; border:1px solid #c0aaaa; border-radius:8px 0 0 8px; outline:none; }
+    .display button { padding:10px 15px; border:none; background:#007bff; color:#faf4f4; font-weight:bold; cursor:pointer; border-radius:0 8px 8px 0; transition:0.3s; }
+    .display button:hover { background:#0056b3; }
+
+    /* --- Controls & Options --- */
+    .controls, .options { margin-bottom:15px; }
+    .controls label, .options label { display:block; margin-bottom:5px; font-size:14px; color:#555; }
+    .options label { display:flex; align-items:center; }
+    .options input { margin-right:8px; }
+    #length { width:100%; }
+
+    /* --- Buttons --- */
+    #generateBtn { width:100%; padding:12px; border:none; border-radius:10px; background:#28a745; color:#fff; font-weight:bold; font-size:16px; cursor:pointer; transition:0.3s; }
+    #generateBtn:hover { background:#218838; }
+
+    /* --- Strength Bar --- */
+    .strength { margin-top:15px; }
+    #strengthBar { width:100%; height:10px; background:#e0e0e0; border-radius:5px; overflow:hidden; }
+    #strengthBar::after { content:''; display:block; height:100%; width:0; background:linear-gradient(to right, red, orange, yellow, green); transition:0.3s; }
+
+    /* --- Responsive --- */
+    @media (max-width:500px){ h1{font-size:22px;} #generateBtn{font-size:14px;padding:10px;} }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Password Generator</h1>
+
+    <div class="display">
+        <input type="text" id="password" placeholder="Your password will appear here" readonly>
+        <button id="copyBtn">📋 Copy</button>
+    </div>
+
+    <div class="controls">
+        <label for="length">Length: <span id="lengthValue">16</span></label>
+        <input type="range" id="length" min="8" max="32" value="16">
+    </div>
+
+    <div class="options">
+        <label><input type="checkbox" id="upper" checked> Uppercase (A-Z)</label>
+        <label><input type="checkbox" id="lower" checked> Lowercase (a-z)</label>
+        <label><input type="checkbox" id="numbers" checked> Numbers (0-9)</label>
+        <label><input type="checkbox" id="symbols" checked> Symbols (!@#$...)</label>
+    </div>
+
+    <button id="generateBtn">⚡ Generate Password</button>
+
+    <div class="strength">
+        <span>Password Strength:</span>
+        <div id="strengthBar"></div>
+    </div>
+</div>
+
+<script>
+const passwordBox = document.getElementById("password");
+const copyBtn = document.getElementById("copyBtn");
+const generateBtn = document.getElementById("generateBtn");
+const lengthSlider = document.getElementById("length");
+const lengthValue = document.getElementById("lengthValue");
+const strengthBar = document.getElementById("strengthBar");
+
+const upperCheckbox = document.getElementById("upper");
+const lowerCheckbox = document.getElementById("lower");
+const numbersCheckbox = document.getElementById("numbers");
+const symbolsCheckbox = document.getElementById("symbols");
+
+const upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const lowerChars = "abcdefghijklmnopqrstuvwxyz";
+const numberChars = "0123456789";
+const symbolChars = "~!@#$%^&*()_+{}[]./<>?|";
+
+// Update length value
+lengthSlider.addEventListener("input", () => { lengthValue.textContent = lengthSlider.value; });
+
+// Copy password
+copyBtn.addEventListener("click", () => {
+    if (!passwordBox.value) return;
+    navigator.clipboard.writeText(passwordBox.value);
+    alert("Password copied!");
+});
+
+// Generate password
+generateBtn.addEventListener("click", () => {
+    const length = parseInt(lengthSlider.value);
+    let charPool = "";
+    const selectedTypes = [];
+
+    if (upperCheckbox.checked) { charPool += upperChars; selectedTypes.push(upperChars); }
+    if (lowerCheckbox.checked) { charPool += lowerChars; selectedTypes.push(lowerChars); }
+    if (numbersCheckbox.checked) { charPool += numberChars; selectedTypes.push(numberChars); }
+    if (symbolsCheckbox.checked) { charPool += symbolChars; selectedTypes.push(symbolChars); }
+
+    if (!charPool) { alert("Select at least one character type!"); return; }
+
+    // Ensure at least one character from each selected type
+    let password = "";
+    selectedTypes.forEach(type => { password += type[Math.floor(Math.random() * type.length)]; });
+
+    // Fill remaining characters
+    while (password.length < length) {
+        password += charPool[Math.floor(Math.random() * charPool.length)];
+    }
+
+    // Shuffle password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    passwordBox.value = password;
+    updateStrength(password);
+});
+
+// Update strength bar
+function updateStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\[\]\.\/\<\>\?\|]/.test(password)) strength++;
+    strengthBar.style.width = (strength/4*100) + "%";
+}
+</script>
+</body>
+</html>
