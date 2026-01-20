@@ -104,7 +104,7 @@ This project is **open source** and free to use under the MIT License.
 
 Made with ❤️ by **Aditya Sadewale**  
 - GitHub: [AdityaSadewale](https://github.com/AdityaSadewale)  
-- LinkedIn: [Your LinkedIn URL]  
+- LinkedIn: [https://www.linkedin.com/in/aditya-sadewale-760359318?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app]  
 
 ---
 
